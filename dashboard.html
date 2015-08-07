@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>D3: Pie layout</title>
+
+
+    <script type="text/javascript" src="javascripts/d3.js"></script>
+    <script type="text/javascript" src="javascripts/crossfilter.js"></script>
+    <script type="text/javascript" src="javascripts/dc.js"></script>
+  </head>
+  <body>
+
+    <div id="chart-ring-year"></div>
+    <div id="chart-hist-value"></div>
+    <div id="chart-row-sports"></div>
+    <script type="text/javascript">
+
+
+
+
+var pieChart   = dc.pieChart("#chart-ring-year"),                           //Create a pie chart instance and attach it to element #chart-ring-year.
+    valueHistChart  = dc.barChart("#chart-hist-value"),
+    sportRowChart = dc.rowChart("#chart-row-sports");
+
+var dataset = [
+    {sport: 'soccer', value: '40', Year: 2011},
+    {sport: 'basketball', value: '10', Year: 2011},
+    {sport: 'hockey', value: '40', Year: 2011},
+    {sport: 'soccer', value: '70', Year: 2012},
+    {sport: 'basketball', value: '20', Year: 2012},
+    {sport: 'basketball', value: '50', Year: 2013},
+    {sport: 'hockey', value: '30', Year: 2013}
+];
+
+
+
+
+function print_filter(filter){
+    var f=eval(filter);
+    if (typeof(f.length) != "undefined") {}else{}
+    if (typeof(f.top) != "undefined") {f=f.top(Infinity);}else{}
+    if (typeof(f.dimension) != "undefined") {f=f.dimension(function(d) { return "";}).top(Infinity);}else{}
+    console.log(filter+"("+f.length+") = "+JSON.stringify(f).replace("[","[\n\t").replace(/}\,/g,"},\n\t").replace("]","\n]"));
+  }
+
+// set crossfilter
+var    ndx = crossfilter(dataset);  print_filter("ndx");
+
+var    yearDim  = ndx.dimension(function(d) {return +d.Year;});   print_filter("yearDim");
+var    valueDimension = ndx.dimension(function(d) {return +d.value/10;});  print_filter("valueDimension");
+var    sportDimension  = ndx.dimension(function(d) {return d.sport;});  print_filter("sportDimension");
+
+
+var   sportGroup = sportDimension.group();
+print_filter("sportGroup");
+
+var valueGroup = valueDimension.group();
+print_filter("valueGroup");
+
+var    valuePerYear = yearDim.group().reduceSum(function(d) {return +d.value;});  //results in key/value pairs, eg {"key":2012,"value":90}
+print_filter("valuePerYear");
+
+var    valuePersport = sportDimension.group().reduceSum(function(d) {return +d.value;});  //       eg {"key":"soccer","value":110},
+print_filter("valuePersport");
+
+var    valueHist    = valueDimension.group().reduceCount();        //gets unique values, and how many times the value occured eg {"key":4,"value":2} means 4 occured twice
+print_filter("valueHist");
+
+pieChart
+    .width(200).height(200)
+    .dimension(sportDimension)
+    .group(valuePersport);
+
+valueHistChart
+    .width(300).height(200)
+    .dimension(sportDimension)
+    .group(valueHist)
+    .x(d3.scale.linear().domain([0,10]));
+
+
+
+valueHistChart.xAxis().tickFormat(function(d) {return d*10}); // convert back to base unit
+valueHistChart.yAxis().ticks(2);
+
+sportRowChart
+    .width(350).height(200)
+    .dimension(yearDim)
+    .group(valueGroup);
+
+dc.renderAll();
+
+
+
+    </script>
+  </body>
+</html>
+
+
+

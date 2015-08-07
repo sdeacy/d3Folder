@@ -1,0 +1,18 @@
+bet-id,status,event-id,event-name,market-id,market-name,runner-id,runner-name,sport-id,sport-name,odds,stake,profit,time-placed,date-settled,current-scores
+
+24230,"finished",6055,"Kashima Antlers vs FC Tokyo",37861,"Handicap (-0.5)",78172,"Kashima Antlers (-0.50)",15,"Soccer",1.92,250,230,"24/07/2015 11:27","24/07/2015 17:14",
+24228,"finished",6055,"Kashima Antlers vs FC Tokyo",37861,"Handicap (-0.5)",78172,"Kashima Antlers (-0.50)",15,"Soccer",1.92,250,230,"24/07/2015 11:25","24/07/2015 17:14",
+24224,"finished",6055,"Kashima Antlers vs FC Tokyo",37861,"Handicap (-0.5)",78172,"Kashima Antlers (-0.50)",15,"Soccer",1.92,250,230,"24/07/2015 11:19","24/07/2015 17:14",
+24204,"finished",6055,"Kashima Antlers vs FC Tokyo",37861,"Handicap (-0.5)",78173,"FC Tokyo (+0.50)",15,"Soccer",2.04,250,-250,"24/07/2015 10:38","24/07/2015 17:14",
+24206,"finished",6055,"Kashima Antlers vs FC Tokyo",37865,"Total Goals (2.5)",78182,"UNDER (+2.50)",15,"Soccer",2.04,249.94,-249.94,"24/07/2015 10:39","24/07/2015 16:47",
+24175,"finished",6043,"Follo vs Brann",37801,"Handicap (0.0)",78056,"Follo (0.0)",15,"Soccer",1.93,200,-200,"24/07/2015 09:33","24/07/2015 09:36",
+24177,"finished",6043,"Follo vs Brann",37802,"Total Goals (3.0)",78058,"OVER (+3.00)",15,"Soccer",1.99,199.92,-199.92,"24/07/2015 09:34","24/07/2015 09:36",
+7226,"finished",3929,"Barnechea vs Palestino",28054,"Match Result",57777,"DRAW",15,"Soccer",3.893,235.73,-235.73,"29/04/2015 15:08","21/07/2015 15:11",
+7224,"finished",3929,"Barnechea vs Palestino",28090,"Handicap (0.75)",57870,"Barnechea (+0.75)",15,"Soccer",2.03,347.43,357.85,"29/04/2015 15:07","17/07/2015 14:30",
+7222,"finished",3929,"Barnechea vs Palestino",28090,"Handicap (0.75)",57870,"Barnechea (+0.75)",15,"Soccer",2.03,716.25,737.73,"29/04/2015 15:00","17/07/2015 14:30",
+5521,"finished",3310,"Orleans vs Troyes AC",23473,"Handicap (0.5)",48443,"Orleans (+0.50)",15,"Soccer",1.954,200,190.8,"09/04/2015 11:28","12/06/2015 11:21",
+6808,"finished",3717,"Lazio vs AS Roma",26715,"Match Result",55048,"Lazio",15,"Soccer",4,200,-200,"29/04/2015 11:07","11/06/2015 14:26",
+5151,"finished",2812,"Bahrain vs Colombia",21118,"Handicap (1.5)",43620,"Bahrain (+1.50)",15,"Baseball",1.98,200,-200,"26/03/2015 16:30","11/06/2015 12:03",
+5145,"finished",2812,"Bahrain vs Colombia",21118,"Handicap (1.5)",43620,"Bahrain (+1.50)",15,"Baseball",2.03,199.88,-199.88,"26/03/2015 16:19","11/06/2015 12:03",
+6812,"finished",3729,"AS Roma vs Palermo",26750,"Match Result",55257,"AS Roma",15,"Baseball",4,200,-200,"29/04/2015 11:07","10/06/2015 17:26",
+2375,"finished",1698,"Blackburn Rovers vs Stoke City",11558,"Handicap (0.25)",24262,"Blackburn (+0.25)",15,"Baseball",5,1000,2000,"13/02/2015 16:06","10/06/2015 17:09",

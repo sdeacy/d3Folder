@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='utf-8'>
+
+  <title>pieAndBar</title>
+
+    <script src="../d3/d3.min.js" charset="utf-8"></script>
+    <script src='../javascripts/crossfilter.js' type='text/javascript'></script>
+    <script src='https://s3-us-west-2.amazonaws.com/hawaiicarboncalculator/js/dc.min.js' type='text/javascript'></script>
+
+
+
+    <!-- doesnt work with this
+    <script src='javascripts/dc.js' type='text/javascript'></script>-->
+
+
+  <style type="text/css"></style>
+
+  <style>
+    h4 span {
+      font-size:14px;
+      font-weight:normal;
+      }
+    h2 {
+      float: right;
+    }
+    h2 span {
+      font-size:14px;
+      font-weight:normal;
+      }
+  </style>
+</head>
+
+<body>
+
+    <div id="test"></div>
+    <div id="chart-ring-year"></div>
+    <script>
+    function print_filter(filter){
+    var f=eval(filter);
+    if (typeof(f.length) != "undefined") {}else{}
+    if (typeof(f.top) != "undefined") {f=f.top(Infinity);}else{}
+    if (typeof(f.dimension) != "undefined") {f=f.dimension(function(d) { return "";}).top(Infinity);}else{}
+    console.log(filter+"("+f.length+") = "+JSON.stringify(f).replace("[","[\n\t").replace(/}\,/g,"},\n\t").replace("]","\n]"));
+  }
+
+
+
+
+      var chart = dc.barChart("#test");
+var pieChart   = dc.pieChart("#chart-ring-year");
+
+var dataset = [
+    {sport: 'soccer', value: '40', Year: 2011},
+    {sport: 'basketball', value: '10', Year: 2011},
+    {sport: 'hockey', value: '40', Year: 2011},
+    {sport: 'soccer', value: '-70', Year: 2012},
+    {sport: 'basketball', value: '20', Year: 2012},
+    {sport: 'basketball', value: '50', Year: 2013},
+    {sport: 'hockey', value: '30', Year: 2013}
+];
+
+var ndx = crossfilter(dataset),
+    sportDimension = ndx.dimension(function (d) {                       //group according to sports
+        return d.sport;
+    }),
+    sumGroup = sportDimension.group().reduceSum(function (d) {              //for each sport, sum up its value
+        return d.value;
+    });
+
+print_filter("sportDimension");
+print_filter("sumGroup");
+chart.width(768)
+    .height(380)
+    .x(d3.scale.ordinal())
+    .xUnits(dc.units.ordinal)
+    .dimension(sportDimension)
+    .group(sumGroup);
+
+chart.on("renderlet", (function(chart){
+    // mix of dc API and d3 manipulation
+    chart.select(".y.axis").remove();                               //remove y-axis
+    chart.select(".x.axis").attr("transform", "translate(50, 253)")   // move x axis
+}));
+
+// chart.render();
+
+pieChart
+    .width(200).height(200)
+    .dimension(sportDimension)
+    .group(sumGroup);
+
+dc.renderAll();
+
+
+
+
+    </script>
+</body>
+</html>

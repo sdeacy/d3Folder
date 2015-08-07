@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js' type='text/javascript'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.11/crossfilter.min.js' type='text/javascript'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.min.js' type='text/javascript'></script>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+
+
+    <link rel="stylesheet" href='https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.css'>
+    <title>filter</title>
+
+    <style>
+      #stakeByCountryPieChart {
+       /* display: none; */
+      }
+      </style>
+  </head>
+
+  <body>
+    <div class="container">
+    <div style="min-height:300px;">
+        <table id='dc-table-graph'>
+          <thead>
+            <tr class='header'>
+              <th>Date</th>
+              <th>Sport</th>
+              <th>Profit</th>
+              <th>Stake</th>
+              <th>Country</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+
+      <a href="javascript:dc.filterAll(); dc.renderAll();">Reset All</a>
+
+
+
+      <div id="stakeBySportPieChart">
+        <h3>Stake by sport</h3>
+        <h4>click to filter by country</h4>
+      </div>
+
+      <div id="stakeByCountryPieChart">
+        <h3>Country</h3>
+      </div>
+
+    </div>
+
+
+
+
+
+    <script>
+      var data = [
+          {
+              "bet-id": "5843",
+              "country": "england",
+              "status": "finished",
+              "event-id": "26133",
+              "event-name": "Tampa Bay at Detroit",
+              "market-id": "321950",
+              "market-name": "moneyline",
+              "runner-id": "660004",
+              "runner-name": "Detroit",
+              "sport-id": "3",
+              "sport-name": "Baseball",
+              "odds": "-125",
+              "stake": "78.46",
+              "profit": "62.77",
+              "time-placed": "03/04/2015 14:45",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5841",
+              "country": "usa",
+              "status": "finished",
+              "event-id": "26133",
+              "event-name": "Tampa Bay at Detroit",
+              "market-id": "321950",
+              "market-name": "moneyline",
+              "runner-id": "660003",
+              "runner-name": "Tampa Bay",
+              "sport-id": "3",
+              "sport-name": "Baseball",
+              "odds": "103",
+              "stake": "200",
+              "profit": "206",
+              "time-placed": "03/04/2015 14:45",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "7037",
+              "country": "england",
+              "status": "finished",
+              "event-id": "27853",
+              "event-name": "Cleveland Cavaliers at Atlanta Hawks",
+              "market-id": "334634",
+              "market-name": "Handicap (1.5)",
+              "runner-id": "684816",
+              "runner-name": "Cleveland Cavaliers (+1.50)",
+              "sport-id": "4",
+              "sport-name": "Basketball",
+              "odds": "-105",
+              "stake": "5",
+              "profit": "4.8",
+              "time-placed": "19/05/2015 12:35",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5791",
+              "country": "spain",
+              "status": "finished",
+              "event-id": "26093",
+              "event-name": "Miami Heat at Cleveland Cavaliers",
+              "market-id": "321781",
+              "market-name": "Handicap",
+              "runner-id": "659665",
+              "runner-name": "Cleveland Cavaliers (-11.50)",
+              "sport-id": "4",
+              "sport-name": "Basketball",
+              "odds": "-109",
+              "stake": "30",
+              "profit": "27.52",
+              "time-placed": "02/04/2015 16:40",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5796",
+              "country": "france",
+              "status": "finished",
+              "event-id": "26093",
+              "event-name": "Miami Heat at Cleveland Cavaliers",
+              "market-id": "321819",
+              "market-name": "Handicap",
+              "runner-id": "659740",
+              "runner-name": "Miami Heat (+9.50)",
+              "sport-id": "4",
+              "sport-name": "Soccer",
+              "odds": "105",
+              "stake": "50",
+              "profit": "52.5",
+              "time-placed": "02/04/2015 16:41",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5804",
+              "country": "france",
+              "status": "finished",
+              "event-id": "26093",
+              "event-name": "Miami Heat at Cleveland Cavaliers",
+              "market-id": "321696",
+              "market-name": "moneyline",
+              "runner-id": "659497",
+              "runner-name": "Cleveland Cavaliers",
+              "sport-id": "4",
+              "sport-name": "Soccer",
+              "odds": "-664",
+              "stake": "500",
+              "profit": "-37.53",
+              "time-placed": "02/04/2015 16:42",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5804",
+              "country": "spain",
+              "status": "finished",
+              "event-id": "26093",
+              "event-name": "Miami Heat at Cleveland Cavaliers",
+              "market-id": "321696",
+              "market-name": "moneyline",
+              "runner-id": "659497",
+              "runner-name": "Cleveland Cavaliers",
+              "sport-id": "4",
+              "sport-name": "Soccer",
+              "odds": "-664",
+              "stake": "100",
+              "profit": "-37.53",
+              "time-placed": "02/04/2015 16:42",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5800",
+              "country": "spain",
+              "status": "finished",
+              "event-id": "26093",
+              "event-name": "Miami Heat at Cleveland Cavaliers",
+              "market-id": "321820",
+              "market-name": "Total",
+              "runner-id": "659742",
+              "runner-name": "OVER (+196.50)",
+              "sport-id": "4",
+              "sport-name": "Basketball",
+              "odds": "102",
+              "stake": "16",
+              "profit": "16.32",
+              "time-placed": "02/04/2015 16:41",
+              "reports-currentscores": ""
+          }];
+
+
+      //create crossfilter instance
+      var bets = crossfilter(data);
+
+
+
+
+
+      function print_filter(filter){
+        var f=eval(filter);
+        //see if the filter came back as an array
+        if (typeof(f.length) != "undefined") {}else{}//console.log("not an array");
+
+        //see if the filter or group needs to be converted to an array by selecting everything //group
+        if (typeof(f.top) != "undefined") {f=f.top(Infinity);}else{}//console.log("not a filter");
+
+        //see if the filter needs a dimension
+        if (typeof(f.dimension) != "undefined") {f=f.dimension(function(d) { return "";}).top(Infinity);}else{}//console.log("not a crossfilter");
+
+        console.log(filter+"("+f.length+") = "+JSON.stringify(f).replace("[","[\n\t").replace(/}\,/g,"},\n\t").replace("]","\n]"));//print it out
+
+      }
+
+      //process the data
+      var parseDate = d3.time.format("%m/%d/%Y %H:%M").parse;
+
+      data.forEach(function(d) {
+          d.date = parseDate(d["time-placed"]);
+          d.profit = +d.profit;
+      });
+
+      var colorScale = d3.scale.ordinal().range(["#5AA1A7"," #3E7074","#77C9C9"]);             //specify range of colours to be used
+
+
+
+      // sports by stake - pie chart
+      var sportsPieChart = dc.pieChart("#stakeBySportPieChart");
+
+
+      //group by sport
+      var bySport = bets.dimension(function(d){
+        return d['sport-name'];
+      });
+      var groupBySport = bySport.group().reduceSum(function(d){return d.stake});
+
+      groupBySport.top(Infinity).forEach(function(d){
+        console.log(d.key + " : " + d.value);
+      });
+
+      sportsPieChart.width(350)
+        .height(350)
+        .radius(150)
+        .dimension(bySport)
+        .group(groupBySport);
+
+
+      sportsPieChart.onclick = function() {
+        console.log("!");
+      };
+
+      var bySportFilter = bySport.filterExact("Basketball");       //now, bySport has only basketball events
+      bySport.top(Infinity).forEach(function(d){
+        console.log("stake: " + d.stake + ", country: " + d.country);
+      });
+      print_filter(bySportFilter);
+
+
+      dc.renderAll();
+
+
+
+
+      // var totalStakePerSport = spoDim.filter("Basketball").group().reduceSum(function(d){return d.stake});
+
+      // console.log("spoDim");
+      // print_filter(spoDim);
+      // console.log("totalStakePerSport");
+      // print_filter(totalStakePerSport);
+      // spoDim.filterAll();
+      // var totalStakePerSport = spoDim.group().reduceSum(function(d){return d.stake});
+      // console.log("spoDim");
+
+      // print_filter(spoDim);
+      // console.log("totalStakePerSport");
+      // print_filter(totalStakePerSport);
+
+
+      // sportsPieChart.width(350)
+      //   .height(350)
+      //   .radius(150)
+      //   .dimension(spoDim)
+      //   .title(function(d){return d.value;})
+      //   .group(totalStakePerSport)
+      //   .colors(colorScale);
+
+      //   sportsPieChart.onClick = function() {
+      //     var countryDim = bets.dimension(function(d){
+      //       return d['country'];
+      //     });
+      //   var totalStakePerCountry = countryDim.group().reduceSum(function(d){return d.stake});
+      //   sportsPieChart
+      //     .dimension(countryDim)
+      //     .group(totalStakePerCountry)
+      //     .colors(colorScale);
+      //     dc.redrawAll();
+      // };
+
+
+
+
+
+
+
+
+
+    </script>
+
+  </body>
+</html>
