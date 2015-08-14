@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js' type='text/javascript'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.11/crossfilter.min.js' type='text/javascript'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.min.js' type='text/javascript'></script>
+
+
+    <link rel="stylesheet" href='https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.css'>
+
+    <title>dashboardDrill</title>
+
+    <style>
+
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+
+      <div id="stakeBySportPieChart">
+        <h3>Stake</h3>
+        <h4>click to see more detail</h4>
+      </div>
+
+      <div id="profitBarChart">
+        <h3>Profit</h3>
+        <h4>click to see more detail</h4>
+      </div>
+
+      <div id="roiBarChart">
+        <h3>ROI</h3>
+        <h4>click to see more detail</h4>
+      </div>
+
+    </div>
+
+    <script>
+      var data = [
+          {
+              "bet-id": "5843",
+              "country": "england",
+              "league"  : "premiership",
+              "status": "finished",
+              "event-id": "26133",
+              "event-name": "Tampa Bay at Detroit",
+              "market-id": "321950",
+              "market-name": "moneyline",
+              "runner-id": "660004",
+              "runner-name": "Detroit",
+              "sport-id": "3",
+              "sport-name": "Soccer",
+              "odds": "-125",
+              "stake": "2000",
+              "profit": "-2000",
+              "time-placed": "03/04/2015 14:45",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5843",
+              "country": "england",
+              "league"  : "premiership",
+              "status": "finished",
+              "event-id": "26133",
+              "event-name": "Tampa Bay at Detroit",
+              "market-id": "321950",
+              "market-name": "moneyline",
+              "runner-id": "660004",
+              "runner-name": "Detroit",
+              "sport-id": "3",
+              "sport-name": "Soccer",
+              "odds": "-125",
+              "stake": "400",
+              "profit": "100",
+              "time-placed": "03/05/2015 14:45",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5843",
+              "country": "england",
+              "league"  : "premiership",
+              "status": "finished",
+              "event-id": "26133",
+              "event-name": "Tampa Bay at Detroit",
+              "market-id": "321950",
+              "market-name": "moneyline",
+              "runner-id": "660004",
+              "runner-name": "Detroit",
+              "sport-id": "3",
+              "sport-name": "Soccer",
+              "odds": "-125",
+              "stake": "100",
+              "profit": "20",
+              "time-placed": "03/06/2015 14:45",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5841",
+              "country": "usa",
+              "league"  : "nfl",
+              "status": "finished",
+              "event-id": "26133",
+              "event-name": "Tampa Bay at Detroit",
+              "market-id": "321950",
+              "market-name": "moneyline",
+              "runner-id": "660003",
+              "runner-name": "Tampa Bay",
+              "sport-id": "3",
+              "sport-name": "Football",
+              "odds": "103",
+              "stake": "1000",
+              "profit": "300",
+              "time-placed": "03/07/2015 14:45",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5841",
+              "country": "usa",
+              "league"  : "nfl2",
+              "status": "finished",
+              "event-id": "26133",
+              "event-name": "Tampa Bay at Detroit",
+              "market-id": "321950",
+              "market-name": "moneyline",
+              "runner-id": "660003",
+              "runner-name": "Tampa Bay",
+              "sport-id": "3",
+              "sport-name": "Football",
+              "odds": "103",
+              "stake": "500",
+              "profit": "100",
+              "time-placed": "03/08/2015 14:45",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5841",
+              "country": "usa",
+              "league"  : "nfl3",
+              "status": "finished",
+              "event-id": "26133",
+              "event-name": "Tampa Bay at Detroit",
+              "market-id": "321950",
+              "market-name": "moneyline",
+              "runner-id": "660003",
+              "runner-name": "Tampa Bay",
+              "sport-id": "3",
+              "sport-name": "Football",
+              "odds": "103",
+              "stake": "300",
+              "profit": "100",
+              "time-placed": "03/09/2015 14:45",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5841",
+              "country": "Canada",
+              "league"  : "cfl",
+              "status": "finished",
+              "event-id": "26133",
+              "event-name": "Tampa Bay at Detroit",
+              "market-id": "321950",
+              "market-name": "moneyline",
+              "runner-id": "660003",
+              "runner-name": "Tampa Bay",
+              "sport-id": "3",
+              "sport-name": "Football",
+              "odds": "103",
+              "stake": "1000",
+              "profit": "300",
+              "time-placed": "03/10/2015 14:45",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5791",
+              "country": "spain",
+              "league"  : "Liga de Futbol Profesional",
+              "status": "finished",
+              "event-id": "26093",
+              "event-name": "Miami Heat at Cleveland Cavaliers",
+              "market-id": "321781",
+              "market-name": "Handicap",
+              "runner-id": "659665",
+              "runner-name": "Cleveland Cavaliers (-11.50)",
+              "sport-id": "4",
+              "sport-name": "Soccer",
+              "odds": "-109",
+              "stake": "300",
+              "profit": "200",
+              "time-placed": "02/13/2015 16:40",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5796",
+              "country": "france",
+              "league"  : "league 1",
+              "status": "finished",
+              "event-id": "26093",
+              "event-name": "Miami Heat at Cleveland Cavaliers",
+              "market-id": "321819",
+              "market-name": "Handicap",
+              "runner-id": "659740",
+              "runner-name": "Miami Heat (+9.50)",
+              "sport-id": "4",
+              "sport-name": "Soccer",
+              "odds": "105",
+              "stake": "500",
+              "profit": "50",
+              "time-placed": "02/14/2015 16:41",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5796",
+              "country": "france",
+              "league"  : "league 1",
+              "status": "finished",
+              "event-id": "26093",
+              "event-name": "Miami Heat at Cleveland Cavaliers",
+              "market-id": "321819",
+              "market-name": "Handicap",
+              "runner-id": "659740",
+              "runner-name": "Miami Heat (+9.50)",
+              "sport-id": "4",
+              "sport-name": "Soccer",
+              "odds": "105",
+              "stake": "500",
+              "profit": "50",
+              "time-placed": "02/14/2015 16:41",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5804",
+              "country": "france",
+              "league"  : "league 2",
+              "status": "finished",
+              "event-id": "26093",
+              "event-name": "Miami Heat at Cleveland Cavaliers",
+              "market-id": "321696",
+              "market-name": "moneyline",
+              "runner-id": "659497",
+              "runner-name": "Cleveland Cavaliers",
+              "sport-id": "4",
+              "sport-name": "Soccer",
+              "odds": "-664",
+              "stake": "500",
+              "profit": "100",
+              "time-placed": "02/15/2015 16:42",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5800",
+              "country": "spain",
+              "league"  : "1",
+              "status": "finished",
+              "event-id": "26093",
+              "event-name": "Miami Heat at Cleveland Cavaliers",
+              "market-id": "321820",
+              "market-name": "Total",
+              "runner-id": "659742",
+              "runner-name": "OVER (+196.50)",
+              "sport-id": "4",
+              "sport-name": "Basketball",
+              "odds": "102",
+              "stake": "800",
+              "profit": "200",
+              "time-placed": "02/16/2015 16:41",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5800",
+              "country": "spain",
+              "league"  : "2",
+              "status": "finished",
+              "event-id": "26093",
+              "event-name": "Miami Heat at Cleveland Cavaliers",
+              "market-id": "321820",
+              "market-name": "Total",
+              "runner-id": "659742",
+              "runner-name": "OVER (+196.50)",
+              "sport-id": "4",
+              "sport-name": "Basketball",
+              "odds": "102",
+              "stake": "400",
+              "profit": "200",
+              "time-placed": "02/17/2015 16:41",
+              "reports-currentscores": ""
+          },
+          {
+              "bet-id": "5800",
+              "country": "spain",
+              "league"  : "3",
+              "status": "finished",
+              "event-id": "26093",
+              "event-name": "Miami Heat at Cleveland Cavaliers",
+              "market-id": "321820",
+              "market-name": "Total",
+              "runner-id": "659742",
+              "runner-name": "OVER (+196.50)",
+              "sport-id": "4",
+              "sport-name": "Basketball",
+              "odds": "102",
+              "stake": "400",
+              "profit": "200",
+              "time-placed": "02/18/2015 16:41",
+              "reports-currentscores": ""
+          }
+      ];
+
+      //create crossfilter instance
+      var ndx = crossfilter(data);
+
+      var colorScale = d3.scale.ordinal().range(["#5AA1A7"," #3E7074","#77C9C9","#1A4219"]);      //custom colurs for the charts
+
+      var totalProfit = 0;                            //for text fields above graphs
+      var totalStake = 0;
+
+      //process the data
+      var parseDate = d3.time.format("%m/%d/%Y %H:%M").parse;
+
+      data.forEach(function(d) {
+          d.date = parseDate(d["time-placed"]);
+          d.profit = +d.profit;
+          d.stake = +d.stake;
+          totalProfit = Math.round(totalProfit + d.profit);
+          totalStake  = Math.round( totalStake + d.stake) ;
+      });
+
+      //===============================================================
+      //create dimensions
+
+      var sportDim = ndx.dimension(function(d){
+        return d['sport-name'];
+      });
+      var countryDim = ndx.dimension(function(d){
+        return d.country;
+      });
+      var leagueDim = ndx.dimension(function(d){
+        return d.league;
+      });
+
+
+      var dimData = sportDim.top(Infinity);
+
+    dimData.forEach(function (x) {
+        console.log(JSON.stringify(x));
+    });
+
+      //===============================================================
+
+      //create piechart - Initially stake by sport
+
+      var sportsPieChart = dc.pieChart("#stakeBySportPieChart");
+
+       //create group for initial pie chart
+      var totalStakePerSport = sportDim.group().reduceSum(function(d){return d.stake});
+
+      //create the pie chart
+      sportsPieChart.width(200)
+        .height(200)
+        .radius(90)
+        .dimension(sportDim)
+        .group(totalStakePerSport)
+
+      //===============================================================
+
+      //profit by sport - bar chart
+
+      var profitBySport = sportDim.group().reduceSum(function(d){return d.profit});
+
+      var profitChart = dc.barChart("#profitBarChart");
+
+      profitChart.width(300)
+          .height(200)
+          .x(d3.scale.ordinal())
+          .xUnits(dc.units.ordinal)
+          .dimension(sportDim)
+          .group(profitBySport)
+          .renderlet(function (chart) {         //adds labels to the chart
+            //Check if labels exist
+            var gLabels = chart.select(".labels");
+            if (gLabels.empty()){
+                gLabels = chart.select(".chart-body").append('g').classed('labels', true);
+            }
+            var gLabelsData = gLabels.selectAll("text").data(chart.selectAll(".bar")[0]);
+            gLabelsData.exit().remove(); //Remove unused elements
+
+            gLabelsData.enter().append("text") //Add new elements
+
+            gLabelsData
+            .attr('text-anchor', 'middle')
+            .attr('fill', 'white')
+            .attr('font-size','12px')
+            .text(function(d){
+                return d3.select(d).data()[0].data.key   //key for name, value for value
+            })
+            .attr('x', function(d){
+                return +d.getAttribute('x') + (d.getAttribute('width')/2);
+            })
+            .attr('y', function(d){ return +d.getAttribute('y') + 15; })
+            // .attr('style', function(d){
+            //     if (+d.getAttribute('height') < 1) return "display:none";
+            // });
+          });
+
+      profitChart.renderXAxis =function(){};
+      profitChart.renderYAxis =function(){};
+
+
+// profitChart.xAxis().tickFormat(function(v) { return ""; });
+
+      //===============================================================
+      //profit by sport - bar chart
+
+
+      var roiChart = dc.barChart("#roiBarChart");
+
+      var spoDim = ndx.dimension(function(d){return d['sport-name'];});
+      var roiBySport = sportDim.group().reduceSum(function(d){return (d.profit / d.stake)});
+      roiChart.width(300).height(200)
+        .dimension(sportDim)
+        .group(roiBySport)
+        .x(d3.scale.ordinal())
+        .xUnits(dc.units.ordinal)
+        ;
+
+
+// do this instead of .renderlet(function(chart) { ... })
+roiChart.on("renderlet", function(chart){
+  console.log("@@@@");
+    // mix of dc API and d3 manipulation
+    chart.select('g.y').style('display', 'none');
+    // its a closure so you can also access other chart variable available in the closure scope
+    moveChart.filter(chart.filter());
+});
+
+        // roiChart.renderlet(function (chart){console.log("!!")}) ;
+
+        roiChart.on('renderlet.a', function(chart, filter){
+                //Check if labels exist
+                var gLabels = chart.select(".labels");
+                if (gLabels.empty()){
+                    gLabels = chart.select(".chart-body").append('g').classed('labels', true);
+                }
+                var gLabelsData = gLabels.selectAll("text").data(chart.selectAll(".bar")[0]);
+                gLabelsData.exit().remove(); //Remove unused elements
+
+                gLabelsData.enter().append("text") //Add new elements
+
+                gLabelsData
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'white')
+                .attr('font-size','12px')
+                .text(function(d){
+                    return d3.select(d).data()[0].data.key;
+                })
+                .attr('x', function(d){
+                    return +d.getAttribute('x') + (d.getAttribute('width')/2);
+                })
+                .attr('y', function(d){ return +d.getAttribute('y') + 15; })
+                // .attr('style', function(d){
+                //     if (+d.getAttribute('height') < 18) return "display:none";
+                // });
+              });
+
+
+      roiChart.renderXAxis =function(){};
+      roiChart.renderYAxis =function(){};
+
+      //===============================================================
+
+
+
+
+      var clickCounter = 0;                                  //to keep track of how many times the chart has been clicked
+      profitChart.onClick = function(i) {
+          clickCounter++;
+          var searchTerm = i.key;
+          if(clickCounter ==1 ){
+              driller(sportDim,countryDim,searchTerm)
+          }
+          else if( clickCounter == 2 ) {
+              driller(countryDim,leagueDim,searchTerm)
+          }
+          else {
+              //do nothing
+          }
+      };
+
+
+      roiChart.onClick = function(i) {
+          clickCounter++;
+          var searchTerm = i.key;
+          if(clickCounter ==1 ){
+              driller(sportDim,countryDim,searchTerm)
+          }
+          else if( clickCounter == 2 ) {
+              driller(countryDim,leagueDim,searchTerm)
+          }
+          else {
+              //do nothing
+          }
+      };
+
+      sportsPieChart.onClick = function (i) {
+        clickCounter++;
+        var searchTerm = i.key;
+        if(clickCounter ==1 ){
+            driller(sportDim,countryDim,searchTerm)
+        }
+        else if( clickCounter == 2 ) {
+            driller(countryDim,leagueDim,searchTerm)
+        }
+        else {
+            //do nothing
+        }
+      };
+
+      dc.renderAll();
+
+      var driller = function(currentDim,nextDim,searchTerm){   //function to drill down into the data//dim1 = dimension currently used//dim2 = dimension that we want to use// x is the term that we will filter by, ie what the user clicked on next
+print_filter(sportDim);
+print_filter(countryDim);
+print_filter(leagueDim);
+
+        //filter the current dimension using the search term
+        currentDim.filter(searchTerm);
+print_filter(currentDim);
+        //create groups for totaling values
+        console.log("currentDim");
+        print_filter(currentDim);
+        console.log("nextDim");
+        print_filter(nextDim);
+        var profitGroup = nextDim.group().reduceSum(function(d){ return d.profit;});
+        var roiGroup    = nextDim.group().reduceSum(function(d){return (d.profit / d.stake)});
+        var volumeGroup = nextDim.group().reduceSum(function(d){return d.stake});
+print_filter(profitGroup);
+
+        //pass dimensions and groups to the charts
+        sportsPieChart
+          .dimension(currentDim)
+          .group(volumeGroup);
+        profitChart
+          .dimension(currentDim)
+          .group(profitGroup);
+        roiChart
+          .dimension(currentDim)
+          .group(roiGroup);
+
+        //redraw all the charts with the new data
+        dc.redrawAll();
+      }
+
+
+      function print_filter(filter){                //for displaying contents of dimensions, groups, filters etc.
+        var f=eval(filter);
+        if (typeof(f.length) != "undefined") {}else{}
+        if (typeof(f.top) != "undefined") {f=f.top(Infinity);}else{}
+        if (typeof(f.dimension) != "undefined") {f=f.dimension(function(d) { return "";}).top(Infinity);}else{}
+        console.log(filter+"("+f.length+") = "+JSON.stringify(f).replace("[","[\n\t").replace(/}\,/g,"},\n\t").replace("]","\n]"));
+      }
+
+
+    </script>
+
+  </body>
+</html>

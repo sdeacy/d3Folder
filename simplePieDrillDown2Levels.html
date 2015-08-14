@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js' type='text/javascript'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.11/crossfilter.min.js' type='text/javascript'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.min.js' type='text/javascript'></script>
+
+
+    <link rel="stylesheet" href='https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.css'>
+
+    <title>dashboardDrill</title>
+
+    <style>
+
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+
+      <div id="pie">
+        <h3>Stake</h3>
+        <h4>click to see more detail</h4>
+         <div id='chart'>
+       <a class='reset'
+          href='javascript:pieChart.filterAll();dc.redrawAll();'
+          style='display: ;'>reset</a>
+      </div>
+
+      <div id='chart'>
+          <span class='reset' style='display: ;'>
+            Current filter: <span class='filter'></span>
+          </span>
+      </div>
+      </div>
+
+<div class='dc-data-count'>
+ <span class='filter-count'></span>
+ selected out of <span class='total-count'></span> records.
+</div>
+
+      <p>First we show how many objects in our data per sport - calcio has 4 entries, basket has 1</p>
+      <p>For eg, Click on calcio to see the number of objects in our data who play calcio, divided by countries</p>
+      <p>The click on Italy to see the leagues in Italy that play calcio</p>
+
+
+
+
+
+  </div>
+
+    <script>
+      var data = [
+                    {sport:"calcio",country:"italy",league:"league a"},
+                    {sport:"calcio",country:"italy",league:"league a"},
+                    {sport:"calcio",country:"ireland",league:"league a"},
+                    {sport:"calcio",country:"italy",league:"league b"},
+                    {sport:"basket",country:"france",league:"league a"}
+                  ];
+
+      var xf = crossfilter(data);
+      var all = xf.groupAll();
+
+      var sportDim = xf.dimension(function(d){return d.sport});
+      var countryDim = xf.dimension(function(d){return d.country});
+      var leagueDim = xf.dimension(function(d){return d.league});
+
+
+      console.log("sportDim", JSON.stringify(sportDim.top(Infinity)));
+
+      console.log("countryDim", JSON.stringify(countryDim.top(Infinity)));      //(countryDim.top(x)) returns the top x number of objects in countryDim
+
+      var groupA = sportDim.group().reduceCount();
+
+      console.log("groupA",JSON.stringify(groupA.top(Infinity)));
+
+
+      var pieChart = dc.pieChart('#pie');
+
+      pieChart
+        .height(500)
+        .width(500)
+        .radius(250)
+        .dimension(sportDim)
+        .group(groupA)
+        .label(function(d) {
+          return d.data.key + ' , quantity: ' + d.data.value;
+        });
+
+
+        var nasdaqCount = dc.dataCount('.dc-data-count');
+        nasdaqCount /* dc.dataCount('.dc-data-count', 'chartGroup'); */
+        .dimension(xf)
+        .group(all)
+       ;
+
+
+  //===============================================================
+
+
+
+
+      var clickCounter = 0;                                  //to keep track of how many times the chart has been clicked
+
+      pieChart.onClick = function (i) {
+        clickCounter++;
+        var searchTerm = i.key;
+        console.log(searchTerm);
+        if(clickCounter ==1 ){
+            driller(sportDim,countryDim,searchTerm)
+        }
+        else if( clickCounter == 2 ) {
+            driller(countryDim,leagueDim,searchTerm)
+        }
+        else {
+            //do nothing
+        }
+      };
+
+      dc.renderAll();
+
+      var driller = function(currentDim,nextDim,searchTerm){   //function to drill down into the data//currentDim = dimension currently used//nextDim = dimension that to use next// searchTerm is the term that we will filter by, ie what the user clicked on next
+
+        //filter the current dimension using the search term
+        // nextDim.filter(searchTerm);
+
+        //create group for counting number of objects
+        function remove_empty_bins(source_group) {
+            return {
+                all:function () {
+                    return source_group.all().filter(function(d) {
+                        return d;
+                    });
+                }
+            };
+        }
+
+        var group = nextDim.group().reduceCount();
+
+        var filteredGroup = remove_empty_bins(group);
+
+        console.log("group", JSON.stringify(group.top(Infinity)));
+        // console.log("filteredGroup", JSON.stringify(filteredGroup.top(Infinity)));
+
+        //pass dimensions and groups to the charts
+        pieChart
+          .filter(searchTerm)
+          .dimension(nextDim)
+          .group(filteredGroup)
+          .label(function(d) {
+          return searchTerm + ', ' + d.data.key + ', quantity: ' + d.data.value;
+        });
+
+        //redraw all the charts with the new data
+        dc.redrawAll();
+      }
+      dc.renderAll();
+
+
+
+
+    </script>
+
+  </body>
+</html>
