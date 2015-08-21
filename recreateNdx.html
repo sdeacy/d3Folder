@@ -8,7 +8,7 @@
 
     <link rel="stylesheet" href='https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.css'>
 
-    <title>dashboardDrill</title>
+    <title>recreateNdx</title>
 
     <style>
 
@@ -21,26 +21,8 @@
       <div id="stakeBySportPieChart">
         <h3>Stake</h3>
         <h4>click to see more detail</h4>
-        <a href="javascript:resFunc();">resFunc</a>
-        <a class='reset'
-          href='javascript:sportsPieChart.filterAll();dc.redrawAll();'
-          >reset</a>
-          <span class='reset' >
-          Current filter: <span class='filter'></span>
-        </span>
       </div>
 
-<div id="stakeBySportPieChart2">
-        <h3>Stake</h3>
-        <h4>click to see more detail</h4>
-        <a href="javascript:resFunc();">resFunc</a>
-        <a class='reset'
-          href='javascript:sportsPieChart.filterAll();dc.redrawAll();'
-          >reset</a>
-          <span class='reset' >
-          Current filter: <span class='filter'></span>
-        </span>
-      </div>
       <div id="profitBarChart">
         <h3>Profit</h3>
         <h4>click to see more detail</h4>
@@ -63,46 +45,13 @@
     </div>
 
     <script>
-//     function resFunc(){
-//       console.log("resFunc");
 
-//       sportDim.filterAll();
-
-
-//       //create piechart - Initially stake by sport
-
-//       var sportsPieChart = dc.pieChart("#stakeBySportPieChart");
-
-
-//       var sportDim = ndx.dimension(function(d){
-//         return d['sport-name'];
-//       });
-//       print_filter(sportDim);
-
-// print_filter(sportDim);
-
-//        //create group for initial pie chart
-//       var totalStakePerSport = sportDim.group().reduceSum(function(d){return d.stake});
-
-//       //create the pie chart
-//       sportsPieChart.width(200)
-//         .height(200)
-//         .radius(90)
-//         .dimension(sportDim)
-//         .group(totalStakePerSport);
-
-//       sportsPieChart.render();
-
-
-//     }
-      var data = [
+    var data = [
                     {"sport-name":"soccer",country:"italy",league:"league b",profit: 10, stake : 100,"time-placed": "02/14/2015 16:41"},
                     {"sport-name":"soccer",country:"italy",league:"league a",profit: 10, stake : 100,"time-placed": "02/15/2015 16:41"},
                     {"sport-name":"soccer",country:"ireland",league:"league ireland",profit: 10, stake : 100,"time-placed": "02/16/2015 16:41"},
                     {"sport-name":"basket",country:"italy",league:"league b",profit: 10, stake : 100,"time-placed": "02/17/2015 16:41"},
-                    {"sport-name":"basket",country:"france",league:"league a",profit: 10, stake : 100,"time-placed": "02/18/2015 16:41"},
-                    {"sport-name":"soccer",country:"france",league:"league france",profit: 10, stake : 100,"time-placed": "02/19/2015 16:41"},
-                    {"sport-name":"football",country:"france",league:"league france",profit: 10, stake : 100,"time-placed": "02/20/2015 16:41"}
+                    {"sport-name":"basket",country:"france",league:"league a",profit: 10, stake : 100,"time-placed": "02/18/2015 16:41"}
                   ];
 
 
@@ -155,12 +104,16 @@
       var totalStakePerSport = sportDim.group().reduceSum(function(d){return d.stake});
 
       //create the pie chart
-      sportsPieChart.width(200)
+      sportsPieChart
+        .width(200)
         .height(200)
         .radius(90)
         .dimension(sportDim)
         .group(totalStakePerSport)
         .turnOnControls(true);
+
+
+      //===============================================================
 
 
       //===============================================================
@@ -180,24 +133,6 @@
 
 
       //===============================================================
-      //profit by sport - bar chart
-
-
-      var roiChart = dc.barChart("#roiBarChart");
-
-      var roiBySport = sportDim.group().reduceSum(function(d){return (d.profit / d.stake)});
-      roiChart.width(300).height(200)
-        .dimension(sportDim)
-        .group(roiBySport)
-        .x(d3.scale.ordinal())
-        .xUnits(dc.units.ordinal);
-
-
-      // roiChart.renderXAxis =function(){};
-      // roiChart.renderYAxis =function(){};
-
-      //===============================================================
-
 
 
       // Table of data
@@ -222,103 +157,126 @@
           .sortBy(function(d){ return d.profit; })
           .order(d3.descending);
 
-
-      var clickCounter = 0;                                  //to keep track of how many times the chart has been clicked
-      // profitChart.onClick = function(i) {
-      //     clickCounter++;
-      //     var searchTerm = i.key;
-      //     if(clickCounter ==1 ){
-      //         driller(sportDim,countryDim,searchTerm)
-      //     }
-      //     else if( clickCounter == 2 ) {
-      //         driller(countryDim,leagueDim,searchTerm)
-      //     }
-      //     else {
-      //         //do nothing
-      //     }
-      // };
+     //===============================================================
 
 
-      // roiChart.onClick = function(i) {
-      //     clickCounter++;
-      //     var searchTerm = i.key;
-      //     if(clickCounter ==1 ){
-      //       var sportDim = ndx.dimension(function(d){
-      //         return d['country'];
-      //     });
-      //     console.log("sportDim");
-      //     print_filter(sportDim);
-      //     driller(sportDim,searchTerm)
-      //     }
-      //     else if( clickCounter == 2 ) {
-      //         driller(leagueDim,searchTerm)
-      //     }
-      //     else {
-      //         //do nothing
-      //     }
-      // };
+    var clickCounter = 0;                                  //to keep track of how many times the chart has been clicked
 
-      // sportsPieChart.onClick = function (i) {
-      //   clickCounter++;
-      //   var searchTerm = i.key;
-      //   if(clickCounter ==1 ){
-      //     var sportDim = ndx.dimension(function(d){
-      //         return d['country'];
-      //     });
-      //     console.log("sportDim");
-      //     print_filter(sportDim);
-      //     driller(sportDim,searchTerm)
-      //   }
-      //   else if( clickCounter == 2 ) {
-      //       var sportDim = ndx.dimension(function(d){
-      //         return d['league'];
-      //     });
-      //     console.log("sportDim");
-      //     print_filter(sportDim);
-      //     driller(sportDim,searchTerm)
-      //   }
-      //   else {
-      //       //do nothing
-      //   }
-      // };
+    sportsPieChart.onClick = function(i) {
+        clickCounter++;
+        var searchTerm = i.key;
 
-      dc.renderAll();
+        if(clickCounter ==1 ){
+          //create crossfilter instance
+          var ndx = crossfilter(data);
 
-      var driller = function(nextDim,searchTerm){   //function to drill down into the data//dim1 = dimension currently used//dim2 = dimension that we want to use// x is the term that we will filter by, ie what the user clicked on next
+          var colorScale = d3.scale.ordinal().range(["#5AA1A7"," #3E7074","#77C9C9","#1A4219"]);      //custom colurs for the charts
+
+          var totalProfit = 0;                            //for text fields above graphs
+          var totalStake = 0;
+
+          //process the data
+          var parseDate = d3.time.format("%m/%d/%Y %H:%M").parse;
+
+          data.forEach(function(d) {
+              d.date = parseDate(d["time-placed"]);
+              d.profit = +d.profit;
+              d.stake = +d.stake;
+              totalProfit = Math.round(totalProfit + d.profit);
+              totalStake  = Math.round( totalStake + d.stake) ;
+          });
+          var dim = ndx.dimension(function(d){
+            return d['country'];
+          });
+          driller(dim,searchTerm);
+        }
+        else if( clickCounter == 2 ) {
+          driller(countryDim,leagueDim,searchTerm)
+        }
+        else {
+          //do nothing
+        }
+    };
+
+    profitChart.onClick = function(i) {
+        clickCounter++;
+        var searchTerm = i.key;
+
+        if(clickCounter ==1 ){
+          //create crossfilter instance
+          var ndx = crossfilter(data);
+
+          var colorScale = d3.scale.ordinal().range(["#5AA1A7"," #3E7074","#77C9C9","#1A4219"]);      //custom colurs for the charts
+
+          var totalProfit = 0;                            //for text fields above graphs
+          var totalStake = 0;
+
+          //process the data
+          var parseDate = d3.time.format("%m/%d/%Y %H:%M").parse;
+
+          data.forEach(function(d) {
+              d.date = parseDate(d["time-placed"]);
+              d.profit = +d.profit;
+              d.stake = +d.stake;
+              totalProfit = Math.round(totalProfit + d.profit);
+              totalStake  = Math.round( totalStake + d.stake) ;
+          });
+          var dim = ndx.dimension(function(d){
+            return d['country'];
+          });
+          driller(dim,searchTerm);
+        }
+        else if( clickCounter == 2 ) {
+          driller(countryDim,leagueDim,searchTerm)
+        }
+        else {
+          //do nothing
+        }
+    };
+
+
+     function driller(dim,searchTerm){
+      print_filter(dim);
 
         console.log(searchTerm);
 
         //filter the current dimension using the search term
-        nextDim.filter(searchTerm);
+        // currentDim.filter(searchTerm);
         //create groups for totaling values
 
-        var profitGroup = nextDim.group().reduceSum(function(d){ return d.profit;});
-        var roiGroup    = nextDim.group().reduceSum(function(d){return (d.profit / d.stake)});
-        var volumeGroup = nextDim.group().reduceSum(function(d){return d.stake});
+        var profitGroup = dim.group().reduceSum(function(d){ return d.profit;});
+        var stakeGroup = dim.group().reduceSum(function(d){return d.stake});
+        print_filter(stakeGroup);
 
         //pass dimensions and groups to the charts
         sportsPieChart
-          // .filter(searchTerm)
-          .dimension(nextDim)
-          .group(volumeGroup);
+          .filter(searchTerm)
+          .width(200)
+          .height(200)
+          .radius(90)
+          .dimension(dim)
+          .group(stakeGroup)
+          .turnOnControls(true);
+
         profitChart
           .filter(searchTerm)
-          .dimension(nextDim)
+          .dimension(dim)
           .group(profitGroup)
           .x(d3.scale.ordinal())
           .xUnits(dc.units.ordinal);
-        roiChart
-          .filter(searchTerm)
-          .dimension(nextDim)
-          .group(roiGroup)
-          .x(d3.scale.ordinal())
-          .xUnits(dc.units.ordinal);;
+
+
+
+
+
+
 
 
         //redraw all the charts with the new data
-        dc.renderAll();
+      dc.redrawAll();
       }
 
+      dc.renderAll();
 
       function print_filter(filter){                //for displaying contents of dimensions, groups, filters etc.
         var f=eval(filter);
@@ -327,7 +285,6 @@
         if (typeof(f.dimension) != "undefined") {f=f.dimension(function(d) { return "";}).top(Infinity);}else{}
         console.log(filter+"("+f.length+") = "+JSON.stringify(f).replace("[","[\n\t").replace(/}\,/g,"},\n\t").replace("]","\n]"));
       }
-
 
     </script>
 

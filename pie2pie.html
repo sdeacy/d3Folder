@@ -14,7 +14,6 @@
 
     <style>
       #stakeByCountryPieChart {
-        display: none;
       }
       </style>
   </head>
@@ -30,6 +29,7 @@
               <th>Profit</th>
               <th>Stake</th>
               <th>Country</th>
+              <th>league</th>
             </tr>
           </thead>
         </table>
@@ -46,6 +46,10 @@
 
       <div id="stakeByCountryPieChart">
         <h3>Country</h3>
+      </div>
+
+      <div id="leagueChart">
+        <h3>bar</h3>
       </div>
 
     </div>
@@ -72,7 +76,8 @@
               "stake": "78.46",
               "profit": "62.77",
               "time-placed": "03/04/2015 14:45",
-              "reports-currentscores": ""
+              "reports-currentscores": "",
+              league:"one"
           },
           {
               "bet-id": "5841",
@@ -90,7 +95,8 @@
               "stake": "200",
               "profit": "206",
               "time-placed": "03/04/2015 14:45",
-              "reports-currentscores": ""
+              "reports-currentscores": "",
+              league:"one"
           },
           {
               "bet-id": "7037",
@@ -108,7 +114,8 @@
               "stake": "5",
               "profit": "4.8",
               "time-placed": "19/05/2015 12:35",
-              "reports-currentscores": ""
+              "reports-currentscores": "",
+              league:"one"
           },
           {
               "bet-id": "5791",
@@ -126,7 +133,8 @@
               "stake": "30",
               "profit": "27.52",
               "time-placed": "02/04/2015 16:40",
-              "reports-currentscores": ""
+              "reports-currentscores": "",
+              league:"one"
           },
           {
               "bet-id": "5796",
@@ -144,7 +152,8 @@
               "stake": "50",
               "profit": "52.5",
               "time-placed": "02/04/2015 16:41",
-              "reports-currentscores": ""
+              "reports-currentscores": "",
+              league:"one"
           },
           {
               "bet-id": "5804",
@@ -162,7 +171,8 @@
               "stake": "500",
               "profit": "-37.53",
               "time-placed": "02/04/2015 16:42",
-              "reports-currentscores": ""
+              "reports-currentscores": "",
+              league:"two"
           },
           {
               "bet-id": "5804",
@@ -180,7 +190,8 @@
               "stake": "100",
               "profit": "-37.53",
               "time-placed": "02/04/2015 16:42",
-              "reports-currentscores": ""
+              "reports-currentscores": "",
+              league:"two"
           },
           {
               "bet-id": "5800",
@@ -198,7 +209,8 @@
               "stake": "16",
               "profit": "16.32",
               "time-placed": "02/04/2015 16:41",
-              "reports-currentscores": ""
+              "reports-currentscores": "",
+              league:"three"
           }];
 
 
@@ -230,12 +242,17 @@
       // sports by stake - pie chart
       var sportsPieChart = dc.pieChart("#stakeBySportPieChart");
 
+
+
       var spoDim = bets.dimension(function(d){
         return d['sport-name'];
       });
       var totalStakePerSport = spoDim.group().reduceSum(function(d){return d.stake});
 
-
+      var leagueDim = bets.dimension(function(d){
+        return d['league'];
+      });
+      var totalStakePerLeague = leagueDim.group().reduceSum(function(d){return d.stake});
 
       sportsPieChart.width(350)
         .height(350)
@@ -255,6 +272,7 @@
       // print_filter("countryDim");
       var totalStakePerCountry = countryDim.group().reduceSum(function(d){return d.stake});
       // print_filter("totalStakePerCountry");
+
       countryPieChart.width(350)
         .height(350)
         .radius(150)
@@ -262,6 +280,17 @@
         .title(function(d){return d.value;})
         .group(totalStakePerCountry)
         .colors(colorScale);
+
+      var leagueChart = dc.pieChart("#leagueChart");
+
+       leagueChart
+        .width(350)
+        .height(350)
+        .radius(150)
+        .dimension(leagueDim)
+        .group(totalStakePerLeague)
+        // .x(d3.scale.ordinal())
+        // .xUnits(dc.units.ordinal);
 
 
 
@@ -283,6 +312,7 @@
             function(d) { return d.profit; },
             function(d) { return d.stake; },
             function(d) { return d.country; },
+            function(d) { return d.league; }
           ])
           .sortBy(function(d){ return d.profit; })
           .order(d3.descending);
@@ -290,18 +320,18 @@
         dc.renderAll();
 
 
-      $('#stakeBySportPieChart').click(function(){
-        $('#stakeBySportPieChart').fadeOut(100);
-        $('#stakeByCountryPieChart').delay(400).fadeIn(300);
-      });
+      // $('#stakeBySportPieChart').click(function(){
+      //   $('#stakeBySportPieChart').fadeOut(100);
+      //   $('#stakeByCountryPieChart').delay(400).fadeIn(300);
+      // });
 
 
-      $('#stakeByCountryPieChart').click(function(){
-        $('#stakeByCountryPieChart').fadeOut(100);
+      // $('#stakeByCountryPieChart').click(function(){
+      //   $('#stakeByCountryPieChart').fadeOut(100);
 
-        $('#stakeBySportPieChart').delay(50).fadeIn(300);
-        dc.filterAll(); dc.renderAll();
-      });
+      //   $('#stakeBySportPieChart').delay(50).fadeIn(300);
+      //   dc.filterAll(); dc.renderAll();
+      // });
 
     </script>
 

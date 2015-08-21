@@ -23,8 +23,9 @@
         <h4>click to see more detail</h4>
          <div id='chart'>
        <a class='reset'
-          href='javascript:pieChart.filterAll();dc.redrawAll();'
+          href='javascript:sportDim.filterAll();dc.filterAll();dc.redrawAll();'
           style='display: ;'>reset</a>
+
       </div>
 
       <div id='chart'>
@@ -107,10 +108,10 @@
         var searchTerm = i.key;
         console.log(searchTerm);
         if(clickCounter ==1 ){
-            driller(sportDim,countryDim,searchTerm)
+            driller(countryDim,searchTerm)
         }
         else if( clickCounter == 2 ) {
-            driller(countryDim,leagueDim,searchTerm)
+            driller(leagueDim,searchTerm)
         }
         else {
             //do nothing
@@ -119,37 +120,28 @@
 
       dc.renderAll();
 
-      var driller = function(currentDim,nextDim,searchTerm){   //function to drill down into the data//currentDim = dimension currently used//nextDim = dimension that to use next// searchTerm is the term that we will filter by, ie what the user clicked on next
+      var driller = function(nextDim,searchTerm){   //function to drill down into the data//currentDim = dimension currently used//nextDim = dimension that to use next// searchTerm is the term that we will filter by, ie what the user clicked on next
 
         //filter the current dimension using the search term
         // nextDim.filter(searchTerm);
 
-        //create group for counting number of objects
-        function remove_empty_bins(source_group) {
-            return {
-                all:function () {
-                    return source_group.all().filter(function(d) {
-                        return d;
-                    });
-                }
-            };
-        }
 
         var group = nextDim.group().reduceCount();
 
-        var filteredGroup = remove_empty_bins(group);
 
         console.log("group", JSON.stringify(group.top(Infinity)));
         // console.log("filteredGroup", JSON.stringify(filteredGroup.top(Infinity)));
 
         //pass dimensions and groups to the charts
         pieChart
-          .filter(searchTerm)
+          // .filter(searchTerm)
           .dimension(nextDim)
-          .group(filteredGroup)
+          .group(group)
           .label(function(d) {
           return searchTerm + ', ' + d.data.key + ', quantity: ' + d.data.value;
         });
+
+
 
         //redraw all the charts with the new data
         dc.redrawAll();

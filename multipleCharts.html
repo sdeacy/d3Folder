@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js' type='text/javascript'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.11/crossfilter.min.js' type='text/javascript'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.min.js' type='text/javascript'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.js' type='text/javascript'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href='https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.css'>
+
+    <title>multipleCharts</title>
+
+    <style>
+      .sportContainer, .countryContainer, .leagueContainer {
+        border-top: 1px dashed;
+        display: block;
+        height: 400px;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <table id="dc-table-graph">
+        <thead>
+          <tr class="header">
+            <th>Day</th><th>sport</th><th>profit</th><th>stake</th><th>country</th><th>league</th>
+          </tr>
+        </thead>
+      </table>
+
+      <div class="sportContainer">
+        <div id="stakeBySportPieChart">
+          <h3>Stake</h3>
+          <h4>click to see more detail</h4>
+          <a class='reset' href='javascript:level1();'>reset</a>
+        </span>
+        </div>
+
+        <div id="profitBarChart">
+          <h3>Profit</h3>
+        </div>
+
+        <div id="roiBarChart">
+          <h3>ROI</h3>
+        </div>
+      </div>
+
+    </div>
+
+    <script>
+
+      var data = [
+                    {"sport-name":"football",country:"italy",league:"league c",profit: -10, stake : 100,"time-placed": "02/14/2015 16:41"},
+                    {"sport-name":"soccer",country:"italy",league:"league a",profit: -50, stake : 100,"time-placed": "02/15/2015 16:41"},
+                    {"sport-name":"soccer",country:"italy",league:"league a",profit: 10, stake : 100,"time-placed": "02/14/2015 16:41"},
+                    {"sport-name":"soccer",country:"italy",league:"league a",profit: 10, stake : 100,"time-placed": "02/15/2015 16:41"},
+                    {"sport-name":"soccer",country:"ireland",league:"league a",profit: 10, stake : 100,"time-placed": "02/16/2015 16:41"},
+                    {"sport-name":"soccer",country:"italy",league:"league b",profit: 10, stake : 100,"time-placed": "02/17/2015 16:41"},
+                    {"sport-name":"basket",country:"france",league:"league f",profit: 10, stake : 100,"time-placed": "02/18/2015 16:41"},
+                    {"sport-name":"basket",country:"spain",league:"league s",profit: 10, stake : 100,"time-placed": "02/19/2015 16:41"}
+                  ];
+
+
+      //create crossfilter instance
+      var ndx = crossfilter(data);
+
+      var colorScale = d3.scale.ordinal().range(["#5AA1A7"," #3E7074","#77C9C9","#1A4219"]);      //custom colurs for the charts
+
+      var totalProfit = 0;                            //for text fields above graphs
+      var totalStake = 0;
+
+      //process the data
+      var parseDate = d3.time.format("%m/%d/%Y %H:%M").parse;
+
+      data.forEach(function(d) {
+          d.date = parseDate(d["time-placed"]);
+          d.profit = +d.profit;
+          d.stake = +d.stake;
+          totalProfit = Math.round(totalProfit + d.profit);
+          totalStake  = Math.round( totalStake + d.stake) ;
+      });
+
+
+
+      //===============================================================
+      //create dimensions
+
+      var sportDim = ndx.dimension(function(d){
+        return d['sport-name'];
+      });
+      var countryDim = ndx.dimension(function(d){
+        return d.country;
+      });
+      var leagueDim = ndx.dimension(function(d){
+        return d.league;
+      });
+
+      var sportSearch = "";
+      var countrySearch = "";
+
+
+      var dimData = sportDim.top(Infinity);
+      dimData.forEach(function (x) {
+        console.log(JSON.stringify(x));
+      });
+
+
+      level1();
+
+
+
+      //===============================================================
+      function level1(){
+        console.log("level1");
+
+        //create piechart - Initially stake by sport
+
+         //create group for initial pie chart
+        var totalStakePerSport = sportDim.group().reduceSum(function(d){return d.stake});
+
+        //create the pie chart
+        var sportStakePieChart = dc.pieChart("#stakeBySportPieChart")
+          .width(200)
+          .height(200)
+          .radius(90)
+          .dimension(sportDim)
+          .group(totalStakePerSport)
+          .turnOnControls(true);
+
+
+        clickCounter = 0;
+
+        sportStakePieChart.onClick = function(i){
+          clickCounter++;
+          if(clickCounter == 1){
+            console.log("i.key",i.key);
+            sportSearch = i.key;
+            level2(sportSearch);
+          }
+          else if(clickCounter == 2){
+            console.log("i.key",i.key);
+            countrySearch = i.key;
+            level3(countrySearch);
+          }
+          else {
+            //do nothing
+          }
+
+        }
+
+        //===============================================================
+
+        //profit by sport - bar chart
+
+        var profitBySport = sportDim.group().reduceSum(function(d){return d.profit});
+
+        var sportProfitBarChart = dc.barChart("#profitBarChart");
+
+        sportProfitBarChart
+          .width(300)
+          .height(200)
+          .x(d3.scale.ordinal())
+          .xUnits(dc.units.ordinal)
+          .dimension(sportDim)
+          .group(profitBySport)
+          .renderlet(function (chart) {         //adds labels to the chart
+            //Check if labels exist
+            var gLabels = chart.select(".labels");
+            if (gLabels.empty()){
+                gLabels = chart.select(".chart-body").append('g').classed('labels', true);
+            }
+            var gLabelsData = gLabels.selectAll("text").data(chart.selectAll(".bar")[0]);
+            gLabelsData.exit().remove(); //Remove unused elements
+
+            gLabelsData.enter().append("text") //Add new elements
+
+            gLabelsData
+            .attr('text-anchor', 'middle')
+            .attr('fill', 'white')
+            .attr('font-size','12px')
+            .text(function(d){
+                return d3.select(d).data()[0].data.key   //key for name, value for value
+            })
+            .attr('x', function(d){
+                return +d.getAttribute('x') + (d.getAttribute('width')/2);
+            })
+            .attr('y', function(d){ return +d.getAttribute('y') + 15; })
+            // .attr('style', function(d){
+            //     if (+d.getAttribute('height') < 1) return "display:none";
+            // });
+          });
+
+        // profitChart.renderXAxis =function(){};
+        // profitChart.renderYAxis =function(){};
+
+
+
+        //===============================================================
+        //roi by sport - bar chart
+
+
+        var sportRoiBarChart = dc.barChart("#roiBarChart");
+
+        var roiBySport = sportDim.group().reduceSum(function(d){return (d.profit / d.stake)});
+
+        sportRoiBarChart
+          .width(300)
+          .height(200)
+          .dimension(sportDim)
+          .group(roiBySport)
+          .x(d3.scale.ordinal())
+          .xUnits(dc.units.ordinal).renderlet(function (chart) {         //adds labels to the chart
+              //Check if labels exist
+              var gLabels = chart.select(".labels");
+              if (gLabels.empty()){
+                  gLabels = chart.select(".chart-body").append('g').classed('labels', true);
+              }
+              var gLabelsData = gLabels.selectAll("text").data(chart.selectAll(".bar")[0]);
+              gLabelsData.exit().remove(); //Remove unused elements
+
+              gLabelsData.enter().append("text") //Add new elements
+
+              gLabelsData
+              .attr('text-anchor', 'middle')
+              .attr('fill', 'white')
+              .attr('font-size','12px')
+              .text(function(d){
+                  return d3.select(d).data()[0].data.key   //key for name, value for value
+              })
+              .attr('x', function(d){
+                  return +d.getAttribute('x') + (d.getAttribute('width')/2);
+              })
+              .attr('y', function(d){ return +d.getAttribute('y') + 15; })
+              // .attr('style', function(d){
+              //     if (+d.getAttribute('height') < 1) return "display:none";
+              // });
+            });
+
+          sportStakePieChart.render();
+          sportProfitBarChart.render();
+          sportRoiBarChart.render();
+      }
+
+
+      // roiChart.renderXAxis =function(){};
+      // roiChart.renderYAxis =function(){};
+
+      //===============================================================
+
+
+
+      // Table of data
+      var dataTable = dc.dataTable("#dc-table-graph");
+
+      var timeDimension = ndx.dimension(function (d) {
+          return d.date;
+        });
+
+      dataTable.width(960).height(800)
+          .dimension(timeDimension)
+          .group(function(d) { return "Bets"})
+          .size(50)
+          .columns([
+            function(d) { return d.date; },
+            function(d) { return d["sport-name"]; },
+            function(d) { return d.profit; },
+            function(d) { return d.stake; },
+            function(d) { return d.country; },
+            function(d) { return d.league; }
+          ])
+          .sortBy(function(d){ return d.profit; })
+          .order(d3.descending);
+
+
+          //===============================================================
+
+      //create piechart -  stake and country   - level 2
+      function level2(sportSearch){
+
+
+        var sportAndCountryStakePieChart = dc.pieChart("#stakeBySportPieChart");
+
+        console.log("sportDim before adding filter soccer");
+        print_filter(sportDim);
+        sportDim.filter(sportSearch);
+        console.log("sportDim");
+        print_filter(sportDim);
+         //create group for initial pie chart
+        var totalStakePerCountry = countryDim.group().reduceSum(function(d){return d.stake});
+
+        //create the pie chart
+        sportAndCountryStakePieChart
+          .width(200)
+          .height(200)
+          .radius(90)
+          .dimension(countryDim)
+          .group(totalStakePerCountry)
+          .turnOnControls(true)
+          // .filter(sportSearch)
+          ;
+
+        sportAndCountryStakePieChart.onClick = function(i){
+          console.log("i.key",i.key);
+          countrySearch = i.key;
+          level3(countrySearch);
+        }
+
+
+        //===============================================================
+
+        //profit by country - bar chart  - level 2
+
+        var profitByCountry = countryDim.group().reduceSum(function(d){return d.profit});
+
+        var sportAndCountryProfitBarChart = dc.barChart("#profitBarChart");
+
+        sportAndCountryProfitBarChart
+          .width(300)
+          .height(200)
+          .x(d3.scale.ordinal())
+          .xUnits(dc.units.ordinal)
+          .dimension(countryDim)
+          .group(profitByCountry)
+          .renderlet(function (chart) {         //adds labels to the chart
+            //Check if labels exist
+            var gLabels = chart.select(".labels");
+            if (gLabels.empty()){
+                gLabels = chart.select(".chart-body").append('g').classed('labels', true);
+            }
+            var gLabelsData = gLabels.selectAll("text").data(chart.selectAll(".bar")[0]);
+            gLabelsData.exit().remove(); //Remove unused elements
+
+            gLabelsData.enter().append("text") //Add new elements
+
+            gLabelsData
+            .attr('text-anchor', 'middle')
+            .attr('fill', 'white')
+            .attr('font-size','12px')
+            .text(function(d){
+                return d3.select(d).data()[0].data.key   //key for name, value for value
+            })
+            .attr('x', function(d){
+                return +d.getAttribute('x') + (d.getAttribute('width')/2);
+            })
+            .attr('y', function(d){ return +d.getAttribute('y') + 15; })
+            // .attr('style', function(d){
+            //     if (+d.getAttribute('height') < 1) return "display:none";
+            // });
+          });
+
+
+        //===============================================================
+          //roi by sport - bar chart
+
+
+          var sportAndCountryRoiBarChart = dc.barChart("#roiBarChart");
+
+          var roiBySport = countryDim.group().reduceSum(function(d){return (d.profit / d.stake)});
+
+          sportAndCountryRoiBarChart
+            .width(300)
+            .height(200)
+            .dimension(countryDim)
+            .group(roiBySport)
+            .x(d3.scale.ordinal())
+            .xUnits(dc.units.ordinal).renderlet(function (chart) {         //adds labels to the chart
+                //Check if labels exist
+                var gLabels = chart.select(".labels");
+                if (gLabels.empty()){
+                    gLabels = chart.select(".chart-body").append('g').classed('labels', true);
+                }
+                var gLabelsData = gLabels.selectAll("text").data(chart.selectAll(".bar")[0]);
+                gLabelsData.exit().remove(); //Remove unused elements
+
+                gLabelsData.enter().append("text") //Add new elements
+
+                gLabelsData
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'white')
+                .attr('font-size','12px')
+                .text(function(d){
+                    return d3.select(d).data()[0].data.key   //key for name, value for value
+                })
+                .attr('x', function(d){
+                    return +d.getAttribute('x') + (d.getAttribute('width')/2);
+                })
+                .attr('y', function(d){ return +d.getAttribute('y') + 15; })
+                // .attr('style', function(d){
+                //     if (+d.getAttribute('height') < 1) return "display:none";
+                // });
+              });
+
+          sportAndCountryStakePieChart.render();
+          sportAndCountryProfitBarChart.render();
+          sportAndCountryRoiBarChart.render();
+        // profitChart.renderXAxis =function(){};
+        // profitChart.renderYAxis =function(){};
+
+
+      }
+
+      //===============================================================
+
+
+
+
+      //===============================================================
+
+      //create piechart -  stake and league  - level 3
+      function level3(searchCountry){
+
+        data = _.reject(data, function(el) { return el['sport-name'] !== "soccer"; });
+
+        data.forEach(function(d) {
+            console.log("D",d);
+        });
+
+        //create crossfilter instance
+        var ndx3 = crossfilter(data);
+
+        var colorScale = d3.scale.ordinal().range(["#5AA1A7"," #3E7074","#77C9C9","#1A4219"]);      //custom colours for the charts
+
+        var totalProfit = 0;                            //for text fields above graphs
+        var totalStake = 0;
+
+        //process the data
+        var parseDate = d3.time.format("%m/%d/%Y %H:%M").parse;
+
+        data.forEach(function(d) {
+            d.date = parseDate(d["time-placed"]);
+            d.profit = +d.profit;
+            d.stake = +d.stake;
+            totalProfit = Math.round(totalProfit + d.profit);
+            totalStake  = Math.round( totalStake + d.stake) ;
+        });
+
+
+
+
+        var newCountryDim = ndx3.dimension(function(d){
+            return d.country;
+        });
+
+        var newLeagueDim = ndx3.dimension(function(d){
+            return d.league;
+        });
+
+        console.log("newCountryDim");
+        print_filter(newCountryDim);
+        newCountryDim.filter(searchCountry);
+
+        console.log("newCountryDim");
+        print_filter(newCountryDim);
+
+        var dimData = newCountryDim.top(Infinity);
+        dimData.forEach(function (x) {
+          console.log("! ",JSON.stringify(x));
+        });
+
+
+
+        var sportAndCountryAndLeagueStakePieChart = dc.pieChart("#stakeBySportPieChart");
+
+         //create group for initial pie chart
+        var totalStakePerLeague = newLeagueDim.group().reduceSum(function(d){return d.stake});
+
+        //create the pie chart
+        sportAndCountryAndLeagueStakePieChart
+          .width(200)
+          .height(200)
+          .radius(90)
+          .dimension(newLeagueDim)
+          .group(totalStakePerLeague)
+          .turnOnControls(true);
+
+
+
+        sportAndCountryAndLeagueStakePieChart.onClick = function(i){
+          console.log("level1");
+          level1();
+        }
+
+        //===============================================================
+
+        //profit by league - bar chart
+
+        var profitByLeague = newLeagueDim.group().reduceSum(function(d){return d.profit});
+
+        var sportAndCountryAndLeagueProfitBarChart = dc.barChart("#profitBarChart");
+
+        sportAndCountryAndLeagueProfitBarChart
+          .width(300)
+          .height(200)
+          .x(d3.scale.ordinal())
+          .xUnits(dc.units.ordinal)
+          .dimension(newLeagueDim)
+          .group(profitByLeague)
+          .renderlet(function (chart) {         //adds labels to the chart
+            //Check if labels exist
+            var gLabels = chart.select(".labels");
+            if (gLabels.empty()){
+                gLabels = chart.select(".chart-body").append('g').classed('labels', true);
+            }
+            var gLabelsData = gLabels.selectAll("text").data(chart.selectAll(".bar")[0]);
+            gLabelsData.exit().remove(); //Remove unused elements
+
+            gLabelsData.enter().append("text") //Add new elements
+
+            gLabelsData
+            .attr('text-anchor', 'middle')
+            .attr('fill', 'white')
+            .attr('font-size','12px')
+            .text(function(d){
+                return d3.select(d).data()[0].data.key   //key for name, value for value
+            })
+            .attr('x', function(d){
+                return +d.getAttribute('x') + (d.getAttribute('width')/2);
+            })
+            .attr('y', function(d){ return +d.getAttribute('y') + 15; })
+            // .attr('style', function(d){
+            //     if (+d.getAttribute('height') < 1) return "display:none";
+            // });
+          });
+
+          //===============================================================
+          //roi by sport - bar chart
+
+
+          var sportAndCountryAndLeagueRoiBarChart = dc.barChart("#roiBarChart");
+
+          var roiBySport = newLeagueDim.group().reduceSum(function(d){return (d.profit / d.stake)});
+
+          sportAndCountryAndLeagueRoiBarChart
+            .width(300)
+            .height(200)
+            .dimension(newLeagueDim)
+            .group(roiBySport)
+            .x(d3.scale.ordinal())
+            .xUnits(dc.units.ordinal).renderlet(function (chart) {         //adds labels to the chart
+                //Check if labels exist
+                var gLabels = chart.select(".labels");
+                if (gLabels.empty()){
+                    gLabels = chart.select(".chart-body").append('g').classed('labels', true);
+                }
+                var gLabelsData = gLabels.selectAll("text").data(chart.selectAll(".bar")[0]);
+                gLabelsData.exit().remove(); //Remove unused elements
+
+                gLabelsData.enter().append("text") //Add new elements
+
+                gLabelsData
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'white')
+                .attr('font-size','12px')
+                .text(function(d){
+                    return d3.select(d).data()[0].data.key   //key for name, value for value
+                })
+                .attr('x', function(d){
+                    return +d.getAttribute('x') + (d.getAttribute('width')/2);
+                })
+                .attr('y', function(d){ return +d.getAttribute('y') + 15; })
+                // .attr('style', function(d){
+                //     if (+d.getAttribute('height') < 1) return "display:none";
+                // });
+              });
+
+        sportAndCountryAndLeagueProfitBarChart.renderXAxis =function(){};
+        sportAndCountryAndLeagueProfitBarChart.renderYAxis =function(){};
+        sportAndCountryAndLeagueRoiBarChart.renderXAxis =function(){};
+        sportAndCountryAndLeagueRoiBarChart.renderYAxis =function(){};
+        sportAndCountryAndLeagueStakePieChart.render();
+        sportAndCountryAndLeagueProfitBarChart.render();
+        sportAndCountryAndLeagueRoiBarChart.render();
+      }
+      //===============================================================
+
+      // var clickCounter = 0;                                  //to keep track of how many times the chart has been clicked
+      // profitChart.onClick = function(i) {
+      //     clickCounter++;
+      //     var searchTerm = i.key;
+      //     if(clickCounter ==1 ){
+      //         driller(sportDim,countryDim,searchTerm)
+      //     }
+      //     else if( clickCounter == 2 ) {
+      //         driller(countryDim,leagueDim,searchTerm)
+      //     }
+      //     else {
+      //         //do nothing
+      //     }
+      // };
+
+
+      // roiChart.onClick = function(i) {
+      //     clickCounter++;
+      //     var searchTerm = i.key;
+      //     if(clickCounter ==1 ){
+      //         driller(sportDim,countryDim,searchTerm)
+      //     }
+      //     else if( clickCounter == 2 ) {
+      //         driller(countryDim,leagueDim,searchTerm)
+      //     }
+      //     else {
+      //         //do nothing
+      //     }
+      // };
+
+      // sportsPieChart.onClick = function (i) {
+      //   clickCounter++;
+      //   var searchTerm = i.key;
+      //   if(clickCounter ==1 ){
+      //       driller(sportDim,countryDim,searchTerm)
+      //   }
+      //   else if( clickCounter == 2 ) {
+      //       driller(countryDim,leagueDim,searchTerm)
+      //   }
+      //   else {
+      //       //do nothing
+      //   }
+      // };
+
+      dc.renderAll();
+
+
+      function print_filter(filter){                //for displaying contents of dimensions, groups, filters etc.
+        var f=eval(filter);
+        if (typeof(f.length) != "undefined") {}else{}
+        if (typeof(f.top) != "undefined") {f=f.top(Infinity);}else{}
+        if (typeof(f.dimension) != "undefined") {f=f.dimension(function(d) { return "";}).top(Infinity);}else{}
+        console.log(filter+"("+f.length+") = "+JSON.stringify(f).replace("[","[\n\t").replace(/}\,/g,"},\n\t").replace("]","\n]"));
+      }
+
+
+    </script>
+
+  </body>
+</html>
