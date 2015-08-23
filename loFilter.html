@@ -22,12 +22,14 @@
     <div class="container">
 
       <div id="stakePieChart">
-        <h3>Stake</h3>
-          <h5>Total :<span id="totalStake"></span></h5>
-          <a class='reset' href='javascript:resetFunc()'>reset</a>
-          <span class = "reset">Current filter: <span class='breadcrumbs'></span></span>
-      </div>
 
+      </div>
+      <div>
+        <h3>Stake</h3>
+        <h5>Total :<span id="totalStake"></span></h5>
+        <a class='reset' href='javascript:resetFunc()'>reset</a>
+        <span class = "reset">Current filter: <span class='breadcrumbs'></span></span>
+      </div>
       <div id="profitBarChart">
         <h3>Profit</h3>
       </div>
@@ -168,49 +170,34 @@
             .sortBy(function(d){ return d.profit; })
             .order(d3.descending);
 
+
+
         stakePieChart.onClick = function (i) {
-          console.log("clickCounter",clickCounter)
           $('.reset').css('visibility', 'visible');
           clickCounter++;
           var searchTerm = i.key;
           if(clickCounter == 1 ){
             breadcrumbs.push(searchTerm);
-
-            $(".breadcrumbs").html('<a href="#" id = "go0">'  +  breadcrumbs[0] + '</a>');
-
+            $(".breadcrumbs").html('<span id = "go0">'  +  breadcrumbs[0] + '</span>');
             data2 = _.filter(data, function(el) { return el['sport-name'] == searchTerm; })
             drawCharts(data2, "country", searchTerm);
           }
           else if( clickCounter == 2 ) {
             breadcrumbs.push(searchTerm);
-
-            $(".breadcrumbs").html(breadcrumbs[0] + ' > ' + '<a href="#" id = "go1">'  +  breadcrumbs[1] + '</a>');
+            $(".breadcrumbs").html(breadcrumbs[0] + ' > ' + '<a href="#" id = "bc">'  +  breadcrumbs[1] + '</a>');
             data3 = _.filter(data2, function(el) { return el['country'] == searchTerm; })
             drawCharts(data3, "league", searchTerm);
           }
           else {
-            breadcrumbs.forEach(function(b){console.log("breadcrumbs",b)});
-
-            console.log("click >3",clickCounter);
+              $(".breadcrumbs").html(breadcrumbs[0] + ' > ' + '<a href="#" id = "bc">'  +  breadcrumbs[1] + '</a>');
           }
 
-          $('#go1').click(function(){
-            console.log("go1");
-            console.log("breadcrumbs0",breadcrumbs[0]);
-            $(".breadcrumbs").html('<a href="#" id = "go0">'  +  breadcrumbs[0] + '</a>');
-            breadcrumbs.pop();
-            drawCharts(data2, "country", searchTerm);
-            clickCounter = 1;
+          $('#bc').click(function(){
+                $(".breadcrumbs").html('<span id = "go0">'  +  breadcrumbs[0] + '</span>');
+                breadcrumbs.pop();
+                drawCharts(data2, "country", searchTerm);
+                clickCounter = 1;
           });
-
-          $('#go0').click(function(){
-            console.log("go0");
-            breadcrumbs.pop();
-            $(".breadcrumbs").html("");
-            drawCharts(data, "sport-name");
-            clickCounter = 0;
-          });
-
         };
 
 
