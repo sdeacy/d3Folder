@@ -83,7 +83,11 @@
           totalStake  = Math.round( totalStake + d.stake) ;
       });
 
+     data = _.reject(data, function(el) { return el['sport-name'] == "soccer"; });
 
+      data.forEach(function(d) {
+          console.log("D",d);
+      });
 
       //===============================================================
       //create dimensions
@@ -412,12 +416,6 @@
       //create piechart -  stake and league  - level 3
       function level3(searchCountry){
 
-        data = _.reject(data, function(el) { return el['sport-name'] !== "soccer"; });
-
-        data.forEach(function(d) {
-            console.log("D",d);
-        });
-
         //create crossfilter instance
         var ndx3 = crossfilter(data);
 
@@ -436,9 +434,6 @@
             totalProfit = Math.round(totalProfit + d.profit);
             totalStake  = Math.round( totalStake + d.stake) ;
         });
-
-
-
 
         var newCountryDim = ndx3.dimension(function(d){
             return d.country;
